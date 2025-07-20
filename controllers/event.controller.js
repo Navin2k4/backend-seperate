@@ -1,7 +1,6 @@
 import { Op } from "sequelize";
 import { errorHandler } from "../utils/error.js";
-import Event from "../models/event.model.js";
-import Registration from "../models/registration.model.js";
+import { Event, Registration } from "../models/database.js";
 
 export const registerEvent = async (req, res, next) => {
   try {
@@ -30,6 +29,10 @@ export const registerEvent = async (req, res, next) => {
 
     // Register
     const registration = await Registration.create({ userId, eventId });
+
+    // Reduce the event's maxRegistration by one
+    await event.update({ maxRegistration: event.maxRegistration - 1 });
+
     res.status(201).json({ message: "Registered successfully", registration });
   } catch (error) {
     next(error);
